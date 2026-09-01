@@ -1,0 +1,27 @@
+# Runtime data contains internal buyers, prices and sale status.
+data-store.json
+data.js
+backups/
+uploads/
+
+# Local configuration and logs
+.env
+.env.*
+*.log
+*.pid
+
+# Imported business workbooks and generated files
+*.xlsx
+*.xls
+*.xlsm
+
+# Dependencies and caches
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS files
+.DS_Store
+Thumbs.db

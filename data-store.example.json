@@ -1,0 +1,106 @@
+{
+  "generatedAt": "2026-09-01T00:00:00.000Z",
+  "source": {
+    "name": "Synthetic demonstration data",
+    "confidential": false
+  },
+  "cargos": [
+    {
+      "id": "demo-001",
+      "year": 2026,
+      "month": 10,
+      "laycanStart": "2026-10-01",
+      "laycanEnd": "2026-10-10",
+      "purchaseType": "fixed",
+      "mine": "Demo Alpha",
+      "spec": "GAR 4200",
+      "priceFixed": 70,
+      "quantityMt": 80000,
+      "status": "sold",
+      "buyer": "Demo Utility A",
+      "purchaseDate": "2026-08-01",
+      "laycanConfirmed": true,
+      "specialTerms": "Synthetic record",
+      "salesRemark": "Demonstration only",
+      "notes": ""
+    },
+    {
+      "id": "demo-002",
+      "year": 2026,
+      "month": 10,
+      "laycanStart": "2026-10-11",
+      "laycanEnd": "2026-10-20",
+      "purchaseType": "index",
+      "mine": "Demo Beta",
+      "spec": "GAR 4700",
+      "priceFormula": "ICI3 + 3.0",
+      "indexRule": "3 weeks before laycan",
+      "quantityMt": 75000,
+      "status": "forsale",
+      "buyer": "",
+      "purchaseDate": "2026-08-05",
+      "laycanConfirmed": false,
+      "specialTerms": "Synthetic record",
+      "salesRemark": "Demonstration only",
+      "notes": ""
+    },
+    {
+      "id": "demo-003",
+      "year": 2026,
+      "month": 11,
+      "laycanStart": "2026-11-01",
+      "laycanEnd": "2026-11-15",
+      "purchaseType": "fixed",
+      "mine": "Demo Gamma",
+      "spec": "NAR 5500",
+      "priceFixed": 100,
+      "quantityMt": 80000,
+      "status": "forsale",
+      "buyer": "",
+      "purchaseDate": "2026-08-10",
+      "laycanConfirmed": false,
+      "specialTerms": "Synthetic record",
+      "salesRemark": "Demonstration only",
+      "notes": ""
+    }
+  ],
+  "indices": [
+    {
+      "id": "demo-ici-2026-08-14",
+      "weekStart": "2026-08-10",
+      "weekEnd": "2026-08-16",
+      "ici1": 125.0,
+      "ici2": 101.0,
+      "ici3": 82.0,
+      "ici4": 63.0,
+      "ici5": 40.0,
+      "publicationDate": "2026-08-14"
+    },
+    {
+      "id": "demo-ici-2026-08-21",
+      "weekStart": "2026-08-17",
+      "weekEnd": "2026-08-23",
+      "ici1": 126.0,
+      "ici2": 102.0,
+      "ici3": 83.0,
+      "ici4": 64.0,
+      "ici5": 41.0,
+      "publicationDate": "2026-08-21"
+    },
+    {
+      "id": "demo-ici-2026-08-28",
+      "weekStart": "2026-08-24",
+      "weekEnd": "2026-08-30",
+      "ici1": 127.0,
+      "ici2": 103.0,
+      "ici3": 84.0,
+      "ici4": 65.0,
+      "ici5": 42.0,
+      "publicationDate": "2026-08-28"
+    }
+  ],
+  "contractForecast": {
+    "updatedAt": "2026-09-01T00:00:00.000Z",
+    "rows": []
+  }
+}

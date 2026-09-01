@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KCH Purchase Plan — 시스템 사용 가이드</title>
+  <style>
+    :root {
+      --dark:  #06345c;
+      --blue:  #0077b6;
+      --mid:   #1b3a5c;
+      --muted: #526b82;
+      --faint: #8aa4b8;
+      --line:  #d7e7f0;
+      --bg:    #edf6fa;
+      --panel: #ffffff;
+      --soft:  #f7fbfe;
+      --green: #15803d;
+      --red:   #b91c1c;
+      --amber: #b45309;
+      font-family: Inter, "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--dark); line-height: 1.6; }
+
+    /* ── Cover ── */
+    .cover {
+      background: linear-gradient(135deg, #06345c 0%, #0077b6 100%);
+      color: #fff;
+      padding: 64px 48px 56px;
+      page-break-after: always;
+    }
+    .cover-logo {
+      font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+      opacity: 0.65; text-transform: uppercase; margin-bottom: 32px;
+    }
+    .cover h1 { font-size: 38px; font-weight: 800; line-height: 1.15; margin-bottom: 12px; }
+    .cover .subtitle { font-size: 17px; opacity: 0.75; margin-bottom: 40px; }
+    .cover-meta { font-size: 13px; opacity: 0.55; }
+    .cover-divider { width: 56px; height: 3px; background: rgba(255,255,255,0.4); border-radius: 2px; margin: 24px 0; }
+
+    /* ── Shell ── */
+    .shell { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* ── TOC ── */
+    .toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 28px 32px; margin-bottom: 48px; }
+    .toc h2 { font-size: 14px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 16px; }
+    .toc ol { padding-left: 20px; }
+    .toc li { margin: 6px 0; font-size: 14.5px; color: var(--blue); }
+    .toc li a { color: inherit; text-decoration: none; }
+    .toc li a:hover { text-decoration: underline; }
+    .toc .sub { font-size: 13px; color: var(--muted); list-style: none; padding-left: 16px; margin-top: 4px; }
+    .toc .sub li::before { content: "· "; }
+
+    /* ── Section ── */
+    .section { margin-bottom: 56px; }
+    .section-title {
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 2px solid var(--dark); padding-bottom: 10px; margin-bottom: 24px;
+    }
+    .section-num {
+      background: var(--dark); color: #fff;
+      border-radius: 50%; width: 30px; height: 30px;
+      display: grid; place-items: center; font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+    .section-title h2 { font-size: 20px; font-weight: 700; }
+
+    h3 { font-size: 15px; font-weight: 700; color: var(--dark); margin: 20px 0 8px; }
+    p  { font-size: 14px; color: #334; line-height: 1.7; margin-bottom: 10px; }
+
+    /* ── Callout boxes ── */
+    .callout {
+      border-left: 4px solid var(--blue);
+      background: #f0f8ff; border-radius: 0 8px 8px 0;
+      padding: 12px 16px; margin: 14px 0; font-size: 13.5px;
+    }
+    .callout.tip  { border-color: var(--green); background: #f0fdf4; }
+    .callout.warn { border-color: #d97706;      background: #fffbeb; }
+    .callout strong { font-weight: 700; }
+
+    /* ── Step list ── */
+    .steps { list-style: none; padding: 0; margin: 12px 0; }
+    .steps li {
+      display: flex; gap: 14px; margin-bottom: 12px;
+      font-size: 14px; color: #223;
+    }
+    .steps li .step-n {
+      background: var(--blue); color: #fff; border-radius: 50%;
+      width: 24px; height: 24px; font-size: 12px; font-weight: 700;
+      display: grid; place-items: center; flex-shrink: 0; margin-top: 1px;
+    }
+    .steps li .step-body { flex: 1; }
+    .steps li .step-body strong { color: var(--dark); }
+
+    /* ── Field table ── */
+    .field-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 12px 0 20px; }
+    .field-table th {
+      background: var(--dark); color: #fff; text-align: left;
+      padding: 8px 12px; font-weight: 600; font-size: 12px;
+    }
+    .field-table td { padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .field-table tr:last-child td { border-bottom: none; }
+    .field-table tr:nth-child(even) td { background: var(--soft); }
+
+    /* ── Status pills ── */
+    .pill {
+      display: inline-block; padding: 2px 9px; border-radius: 20px;
+      font-size: 12px; font-weight: 600; line-height: 1.6;
+    }
+    .pill.sold     { background: #dcfce7; color: #15803d; }
+    .pill.forsale  { background: #dbeafe; color: #1e40af; }
+    .pill.planned  { background: #fef9c3; color: #92400e; }
+    .pill.fixed    { background: #f3f4f6; color: #374151; }
+    .pill.index    { background: #ede9fe; color: #6d28d9; }
+    .pill.bull     { background: #dcfce7; color: #15803d; }
+    .pill.bear     { background: #fee2e2; color: #b91c1c; }
+    .pill.neutral  { background: #f1f5f9; color: #475569; }
+
+    /* ── Screen mockup ── */
+    .screen {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 8px; padding: 16px 18px; margin: 14px 0;
+      font-size: 13px; color: var(--muted);
+    }
+    .screen .screen-bar {
+      display: flex; gap: 6px; margin-bottom: 12px;
+    }
+    .screen .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .screen .dot.r { background: #fc5c5c; }
+    .screen .dot.y { background: #fdbc40; }
+    .screen .dot.g { background: #34c84a; }
+    .screen-nav {
+      display: flex; gap: 4px; background: var(--soft);
+      border: 1px solid var(--line); border-radius: 7px;
+      padding: 3px; width: fit-content; margin-bottom: 14px;
+    }
+    .screen-nav span {
+      background: var(--dark); color: #fff; border-radius: 5px;
+      padding: 3px 10px; font-size: 12px; font-weight: 600;
+    }
+    .screen-nav em { padding: 3px 10px; font-style: normal; font-size: 12px; color: var(--muted); }
+
+    /* ── Mini KPI block ── */
+    .kpi-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+    .kpi-box {
+      background: linear-gradient(180deg, #fff 0%, #f5fbff 100%);
+      border: 1px solid #cfe3ee; border-radius: 8px;
+      padding: 10px 14px; flex: 1; min-width: 130px;
+    }
+    .kpi-box .kpi-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .kpi-box .kpi-val { font-size: 20px; font-weight: 800; color: var(--dark); line-height: 1.1; }
+    .kpi-box .kpi-sub { font-size: 11px; color: var(--faint); margin-top: 2px; }
+
+    /* ── Glossary ── */
+    .glossary dt { font-weight: 700; color: var(--dark); font-size: 14px; margin-top: 14px; }
+    .glossary dd { margin-left: 0; font-size: 13.5px; color: #334; margin-top: 2px; padding-left: 14px; border-left: 2px solid var(--line); }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; }
+      .cover { page-break-after: always; }
+      .section { page-break-inside: avoid; }
+      .callout, .screen, .kpi-row, .field-table { page-break-inside: avoid; }
+    }
+
+    @media (max-width: 600px) {
+      .cover { padding: 36px 24px; }
+      .cover h1 { font-size: 28px; }
+      .shell { padding: 24px 16px 60px; }
+      .kpi-box .kpi-val { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ COVER ══════════════ -->
+<div class="cover">
+  <div class="cover-logo">KCH Energy · 내부 시스템 문서</div>
+  <h1>KCH Purchase Plan<br>시스템 사용 가이드</h1>
+  <p class="subtitle">석탄 구매 계획 및 가격 관리 플랫폼 · 운영 매뉴얼</p>
+  <div class="cover-divider"></div>
+  <p class="cover-meta">적용 버전: 2026 &nbsp;|&nbsp; 대상: 구매팀, 경영진 &nbsp;|&nbsp; 문서 언어: 한국어</p>
+</div>
+
+<div class="shell">
+
+<!-- ══════════════ TOC ══════════════ -->
+<div class="toc">
+  <h2>목차</h2>
+  <ol>
+    <li><a href="#s1">시스템 개요</a></li>
+    <li><a href="#s2">화면 탐색 개요</a></li>
+    <li>
+      <a href="#s3">월별 구매 계획 (Monthly Plan)</a>
+      <ul class="sub">
+        <li>월/연도 전환</li>
+        <li>KPI 카드 의미</li>
+        <li>화물 목록 및 필터</li>
+        <li>화물 상태 설명</li>
+      </ul>
+    </li>
+    <li>
+      <a href="#s4">화물 가격 산정 워크벤치 (Pricing Workbench)</a>
+      <ul class="sub">
+        <li>워크벤치 진입 방법</li>
+        <li>ICI 참조 데이터 해석</li>
+        <li>결제가 민감도 분석</li>
+        <li>구매 가격 판단 (Judgment)</li>
+      </ul>
+    </li>
+    <li>
+      <a href="#s5">가격 예측 (Price Forecast)</a>
+      <ul class="sub">
+        <li>주별 ICI 예측 매트릭스</li>
+        <li>월평균 가격 요약</li>
+        <li>화물 결제 매트릭스</li>
+      </ul>
+    </li>
+    <li>
+      <a href="#s6">포트폴리오 분석 (Portfolio Analytics)</a>
+    </li>
+    <li>
+      <a href="#s7">데이터 관리 작업</a>
+      <ul class="sub">
+        <li>화물 추가 / 수정</li>
+        <li>ICI 데이터 업데이트</li>
+        <li>Excel 데이터 가져오기</li>
+      </ul>
+    </li>
+    <li><a href="#s8">용어집</a></li>
+  </ol>
+</div>
+
+
+<!-- ══════════════ SECTION 1 ══════════════ -->
+<div class="section" id="s1">
+  <div class="section-title">
+    <div class="section-num">1</div>
+    <h2>시스템 개요</h2>
+  </div>
+
+  <p>
+    KCH Purchase Plan은 회사 내부의 석탄 구매 계획 및 가격 관리 플랫폼입니다.
+    연간 구매 화물(Cargo)을 추적하고, 가격 정보를 기록하며, Argus ICI 지수와 연동하여
+    아직 결제되지 않은 지수 연동 화물의 가격 예측 및 리스크 판단을 지원합니다.
+  </p>
+  <p>
+    시스템은 사내 브라우저에서 실행되며 별도 소프트웨어 설치가 필요하지 않습니다.
+    지정된 주소에 접속하면 바로 사용할 수 있으며, 데이터는 실시간으로 공유됩니다.
+  </p>
+
+  <h3>시스템의 4가지 핵심 모듈</h3>
+  <div class="kpi-row">
+    <div class="kpi-box">
+      <div class="kpi-label">① 월별 계획</div>
+      <div class="kpi-val" style="font-size:15px">Monthly Plan</div>
+      <div class="kpi-sub">당월 화물 KPI 및 목록 조회</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-label">② 가격 산정 워크벤치</div>
+      <div class="kpi-val" style="font-size:15px">Pricing Workbench</div>
+      <div class="kpi-sub">개별 화물 심층 분석</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-label">③ 가격 예측</div>
+      <div class="kpi-val" style="font-size:15px">Price Forecast</div>
+      <div class="kpi-sub">ICI 추세 예측 및 결제가 추정</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-label">④ 포트폴리오 분석</div>
+      <div class="kpi-val" style="font-size:15px">Portfolio Analytics</div>
+      <div class="kpi-sub">연간 구매 구조 전체 조회</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════ SECTION 2 ══════════════ -->
+<div class="section" id="s2">
+  <div class="section-title">
+    <div class="section-num">2</div>
+    <h2>화면 탐색 개요</h2>
+  </div>
+
+  <p>상단 내비게이션 바는 항상 표시되며, 왼쪽 브랜드 영역과 오른쪽 컨트롤 영역으로 구성됩니다.</p>
+
+  <div class="screen">
+    <div class="screen-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+    <div class="screen-nav">
+      <span>Monthly Plan</span>
+      <em>Portfolio Analytics</em>
+      <em>Price Forecast</em>
+    </div>
+    <p style="margin:0">← 탭을 클릭하여 메인 화면 전환 &nbsp;|&nbsp; 우측에 검색창, 내보내기, 가져오기 버튼</p>
+  </div>
+
+  <table class="field-table">
+    <thead><tr><th>탐색 요소</th><th>기능 설명</th></tr></thead>
+    <tbody>
+      <tr><td><strong>KCH 로고</strong> (좌측 상단)</td><td>클릭 시 월별 계획 메인 화면으로 이동 (모든 화면에서 사용 가능)</td></tr>
+      <tr><td><strong>Monthly Plan</strong></td><td>월별 구매 화물 목록 및 통계</td></tr>
+      <tr><td><strong>Portfolio Analytics</strong></td><td>연간 포트폴리오 분석, 광산 순위, 바이어 익스포저 등</td></tr>
+      <tr><td><strong>Price Forecast</strong></td><td>ICI 지수 예측 및 지수 연동 화물 결제가 추정</td></tr>
+      <tr><td><strong>검색창</strong></td><td>화물명, 광산, 바이어로 실시간 필터링</td></tr>
+      <tr><td><strong>Export For Sale Plan</strong></td><td>현재 '판매 중' 화물 목록 내보내기 (Excel 형식)</td></tr>
+      <tr><td><strong>Import Data ↑</strong></td><td>Excel 파일 업로드로 구매 데이터 일괄 가져오기</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout tip">
+    <strong>💡 참고:</strong> '가격 산정 워크벤치' 화면(개별 화물)에서는 좌측 상단의 <strong>← Back to Plan</strong> 버튼을 클릭하면 월별 계획으로 돌아갑니다.
+  </div>
+</div>
+
+
+<!-- ══════════════ SECTION 3 ══════════════ -->
+<div class="section" id="s3">
+  <div class="section-title">
+    <div class="section-num">3</div>
+    <h2>월별 구매 계획 (Monthly Plan)</h2>
+  </div>
+
+  <p>시스템의 메인 화면으로, 지정된 월의 구매 KPI 요약, 전체 화물 목록, ICI 지수 추세 차트를 표시합니다.</p>
+
+  <!-- 3.1 -->
+  <h3>3.1 &nbsp; 월/연도 전환</h3>
+  <p>화면 상단에 월 탭(Jan — Dec)과 연도 좌우 화살표가 있습니다.</p>
+  <ul class="steps">
+    <li><div class="step-n">1</div><div class="step-body">월 탭(예: <strong>Jun</strong>)을 클릭하여 해당 월 데이터를 조회합니다.</div></li>
+    <li><div class="step-n">2</div><div class="step-body">연도 옆 <strong>‹ ›</strong>를 클릭하여 전년도 / 다음 연도로 이동합니다.</div></li>
+    <li><div class="step-n">3</div><div class="step-body">맨 오른쪽 <strong>Total</strong>을 클릭하면 연간 전체 합산을 조회합니다.</div></li>
+  </ul>
+
+  <!-- 3.2 -->
+  <h3>3.2 &nbsp; KPI 카드 의미</h3>
+  <p>월을 선택하면 상단에 6개의 KPI 카드가 표시됩니다.</p>
+  <table class="field-table">
+    <thead><tr><th>KPI 카드</th><th>의미</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Total Quantity</strong></td><td>해당 월 전체 화물 합산 수량 (MT)</td></tr>
+      <tr><td><strong>Fixed Price</strong></td><td>고정 가격 화물 수량</td></tr>
+      <tr><td><strong>Index Price</strong></td><td>지수 연동 가격 화물 수량</td></tr>
+      <tr><td><strong>Sold</strong></td><td>판매 완료된 화물 수량</td></tr>
+      <tr><td><strong>For Sale</strong></td><td>판매 중, 아직 거래 미성사 화물 수량</td></tr>
+      <tr><td><strong>Planned</strong></td><td>계획 중, 아직 확정되지 않은 화물 수량</td></tr>
+    </tbody>
+  </table>
+  <p>각 카드 하단에 전월 대비 증감률이 표시됩니다 (초록색 ▲ 상승, 빨간색 ▼ 하락).</p>
+
+  <!-- 3.3 -->
+  <h3>3.3 &nbsp; 화물 목록 및 필터</h3>
+  <p>화물 표는 다양한 필터를 조합하여 활용할 수 있습니다.</p>
+  <table class="field-table">
+    <thead><tr><th>필터 항목</th><th>옵션</th><th>설명</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Status (상태)</strong></td><td>All / Sold / For Sale / Planned</td><td>화물의 현재 상태로 필터링</td></tr>
+      <tr><td><strong>Type (가격 유형)</strong></td><td>All / Fixed / Index</td><td>고정가 vs 지수 연동가</td></tr>
+      <tr><td><strong>Mine (광산)</strong></td><td>드롭다운 선택</td><td>공급사 광산으로 필터링</td></tr>
+      <tr><td><strong>Buyer (바이어)</strong></td><td>드롭다운 선택</td><td>바이어명으로 필터링</td></tr>
+      <tr><td><strong>검색창</strong></td><td>자유 텍스트</td><td>광산, 화물명, 바이어 부분 검색</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.4 &nbsp; 화물 표 컬럼 설명</h3>
+  <table class="field-table">
+    <thead><tr><th>컬럼</th><th>의미</th></tr></thead>
+    <tbody>
+      <tr><td><strong>#</strong></td><td>현재 필터 결과 내 순번</td></tr>
+      <tr><td><strong>Status</strong></td><td>화물 상태 (3.5 참조)</td></tr>
+      <tr><td><strong>Mine</strong></td><td>광산명. '구매 판단'이 저장된 경우 광산명 아래 판단 태그 표시 (예: Bull · Wait · $106.50/t)</td></tr>
+      <tr><td><strong>Spec</strong></td><td>석탄 품질 규격 (예: NAR4400, GAR5700)</td></tr>
+      <tr><td><strong>Qty</strong></td><td>계약 수량 (만 MT)</td></tr>
+      <tr><td><strong>Price</strong></td><td>고정가: 가격 표시 / 지수 연동: 공식 표시 (예: ICI3/4600*4400+2.75)</td></tr>
+      <tr><td><strong>Type</strong></td><td><span class="pill fixed">Fixed</span> 고정가 &nbsp;|&nbsp; <span class="pill index">Index</span> 지수 연동</td></tr>
+      <tr><td><strong>Buyer</strong></td><td>배정된 바이어; 미판매 시 공란</td></tr>
+      <tr><td><strong>Loading Window</strong></td><td>선적 기간 (예: 6/26–7/5)</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3.5 -->
+  <h3>3.5 &nbsp; 화물 상태 설명</h3>
+  <table class="field-table">
+    <thead><tr><th>상태 태그</th><th>의미</th><th>대표 상황</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="pill sold">Sold</span></td>
+        <td>판매 완료, 바이어 확정</td>
+        <td>계약 체결 완료, 이행 대기 중</td>
+      </tr>
+      <tr>
+        <td><span class="pill forsale">For Sale</span></td>
+        <td>판매 중, 오퍼 가능</td>
+        <td>구매 확정, 바이어 모집 중</td>
+      </tr>
+      <tr>
+        <td><span class="pill planned">Planned</span></td>
+        <td>계획 중, 미확정</td>
+        <td>구매 의향 있음, 계약 미체결</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 3.6 -->
+  <h3>3.6 &nbsp; ICI 지수 차트</h3>
+  <p>
+    화면 우측(또는 하단)에 Argus ICI 지수 히스토리 추세 차트가 표시됩니다.
+    <strong>ICI2 / ICI3 / ICI4 / ICI5</strong> 탭을 클릭하여 각 지수의 역사적 가격 곡선을 확인하고
+    시장 동향을 파악할 수 있습니다.
+  </p>
+  <div class="callout">
+    <strong>ICI 지수 소개:</strong>
+    ICI(Indonesia Coal Index)는 Argus가 발행하는 인도네시아 석탄 주별 기준 가격 지수입니다.
+    ICI2 = NAR 5000 kcal, ICI3 = NAR 4200 kcal, ICI4 = NAR 3800 kcal, ICI5 = NAR 3400 kcal.
+    가격 단위는 $/t (미달러/톤)입니다.
+  </div>
+
+  <!-- 클릭 진입 -->
+  <h3>3.7 &nbsp; 화물 행 클릭 → 가격 산정 워크벤치 진입</h3>
+  <p>
+    <strong>화물 목록의 임의 행을 클릭</strong>하면 해당 화물 전용 '가격 산정 워크벤치' 화면으로 이동하여
+    심층적인 가격 분석 및 판단을 수행할 수 있습니다.
+  </p>
+  <div class="callout tip">
+    <strong>💡 참고:</strong> 워크벤치 확인 후 좌측 상단 <strong>← Back to Plan</strong>을 클릭하면 화물 목록으로 돌아갑니다.
+  </div>
+</div>
+
+
+<!-- ══════════════ SECTION 4 ══════════════ -->
+<div class="section" id="s4">
+  <div class="section-title">
+    <div class="section-num">4</div>
+    <h2>화물 가격 산정 워크벤치 (Pricing Workbench)</h2>
+  </div>
+
+  <p>
+    가격 산정 워크벤치는 본 시스템의 핵심 기능 중 하나로, <strong>지수 연동 가격의 판매 중 화물</strong>을 위해 설계되었습니다.
+    지수 발표 전에 가격 추세를 미리 판단하고, 매입/관망/회피 등 운영 의사결정을 내릴 수 있도록 지원합니다.
+  </p>
+
+  <div class="callout warn">
+    <strong>주의:</strong> 본 워크벤치는 <strong>$/t (톤당 가격)</strong>만 표시하며, 총금액이나 이익은 표시하지 않습니다.
+    구매 관점의 순수성을 유지하기 위한 설계입니다.
+  </div>
+
+  <h3>4.1 &nbsp; 워크벤치 진입 방법</h3>
+  <ul class="steps">
+    <li><div class="step-n">1</div><div class="step-body">월별 계획(Monthly Plan) 화면에서 대상 화물을 찾습니다.</div></li>
+    <li><div class="step-n">2</div><div class="step-body"><strong>해당 행을 직접 클릭</strong>하면 해당 화물의 가격 산정 워크벤치로 자동 이동합니다.</div></li>
+    <li><div class="step-n">3</div><div class="step-body">워크벤치 상단에 화물명, 연월, 상태, 가격 유형이 표시됩니다.</div></li>
+  </ul>
+
+  <h3>4.2 &nbsp; 좌측 패널: 화물 기본 정보</h3>
+  <table class="field-table">
+    <thead><tr><th>항목</th><th>의미</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Mine</strong></td><td>광산명 (예: Adaro)</td></tr>
+      <tr><td><strong>Spec</strong></td><td>석탄 규격 (예: NAR4400)</td></tr>
+      <tr><td><strong>Status</strong></td><td>현재 상태 (For Sale / Sold / Planned)</td></tr>
+      <tr><td><strong>Buyer</strong></td><td>바이어 (미판매 시 "—")</td></tr>
+      <tr><td><strong>Quantity</strong></td><td>계약 수량</td></tr>
+      <tr><td><strong>Laycan</strong></td><td>선적 기간 (예: 1–30 Jun)</td></tr>
+      <tr><td><strong>Purchase Date</strong></td><td>구매 일자</td></tr>
+      <tr><td><strong>Formula</strong></td><td>지수 가격 공식 (예: ICI3/4600*4400+2.75)</td></tr>
+      <tr><td><strong>Index Rule</strong></td><td>가격 산정 규칙 (예: "1 month before laycan")</td></tr>
+      <tr><td><strong>Pricing Period</strong></td><td>시스템이 자동 계산한 참조 기간 (예: May 2026 avg)</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 4.3 -->
+  <h3>4.3 &nbsp; 우측 상단: ICI 참조 데이터</h3>
+  <p>
+    시스템은 화물의 가격 산정 규칙(예: "1 month before laycan")에 따라 자동으로 참조 기간(예:
+    Laycan 6월 → 참조 기간 5월)을 결정하고, 해당 기간의 모든 ICI 주별 데이터를 나열합니다.
+  </p>
+  <p>표는 공식에 사용된 지수 컬럼만 표시합니다 (예: 공식이 ICI3이면 ICI3 컬럼만 표시, 나머지 불표시).</p>
+
+  <table class="field-table">
+    <thead><tr><th>행 유형</th><th>표시</th><th>의미</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Actual (발표 완료)</strong></td>
+        <td><span class="pill sold" style="font-size:11px">Actual</span></td>
+        <td>Argus가 공식 발표한 실제 ICI 가격으로, 수정 불가</td>
+      </tr>
+      <tr>
+        <td><strong>Forecast (예측)</strong></td>
+        <td><span class="pill forsale" style="font-size:11px;background:#dbeafe;color:#1e40af">Forecast</span></td>
+        <td>아직 발표되지 않은 주별 데이터. 편집 가능한 입력란으로 표시되어 예측값 수동 입력 가능</td>
+      </tr>
+      <tr>
+        <td><strong>Avg (평균)</strong></td>
+        <td>마지막 행</td>
+        <td>현재 모든 주별 데이터(예측 포함)의 월평균 가격. 결제가 계산의 기준</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout tip">
+    <strong>💡 핵심 기능:</strong>
+    Forecast 행의 입력란에 ICI 예측 가격을 입력하면 <strong>월평균과 최종 결제가가 실시간으로 자동 업데이트</strong>됩니다.
+    별도 계산 없이 "현재 가격이 유리한가"를 즉시 판단할 수 있는 핵심 도구입니다.
+  </div>
+
+  <h3>4.4 &nbsp; 결제 공식 바</h3>
+  <p>
+    참조 데이터 표 아래에 짙은 색 배너가 표시되며, 다음 내용을 포함합니다.
+  </p>
+  <ul style="padding-left:20px;font-size:14px;line-height:2">
+    <li>좌측: 계약 가격 공식 (예: <code style="background:#eee;padding:1px 5px;border-radius:3px">ICI3/4600*4400+2.75</code>)</li>
+    <li>우측: 현재 월평균 기준으로 계산된 <strong>예상 결제가 ($/t)</strong></li>
+  </ul>
+  <p>Forecast 행 데이터를 수정하면 우측 결제가가 즉시 변경됩니다.</p>
+
+  <!-- 4.5 -->
+  <h3>4.5 &nbsp; 우측 중단: 결제가 민감도</h3>
+  <p>
+    ICI 지수 전체가 $1/$2/$3/t 상승 또는 하락할 경우 결제가가 어떻게 변하는지 보여주는 표입니다.
+  </p>
+  <table class="field-table">
+    <thead><tr><th>시나리오</th><th>Forecast $/t</th><th>Base 대비 변화 $/t</th></tr></thead>
+    <tbody>
+      <tr><td><span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600">+$3/t</span></td><td>$84.76</td><td style="color:#15803d">+$2.87/t</td></tr>
+      <tr><td><span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600">+$2/t</span></td><td>$83.81</td><td style="color:#15803d">+$1.91/t</td></tr>
+      <tr><td><span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600">+$1/t</span></td><td>$82.85</td><td style="color:#15803d">+$0.96/t</td></tr>
+      <tr style="background:#f7fbfe;font-weight:600"><td><span style="background:#f1f5f9;color:#334;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600">Base</span></td><td>$81.89</td><td style="color:#888">Base</td></tr>
+      <tr><td><span style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600">-$1/t</span></td><td>$80.94</td><td style="color:#b91c1c">-$0.96/t</td></tr>
+      <tr><td><span style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600">-$2/t</span></td><td>$79.98</td><td style="color:#b91c1c">-$1.91/t</td></tr>
+      <tr><td><span style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600">-$3/t</span></td><td>$79.02</td><td style="color:#b91c1c">-$2.87/t</td></tr>
+    </tbody>
+  </table>
+  <p>위 수치는 "현재 Forecast 행 월평균"을 기준으로 추산되며, 수량과는 무관합니다.</p>
+
+  <!-- 4.6 -->
+  <h3>4.6 &nbsp; 우측 하단: 구매 가격 판단 (Procurement Price Judgment)</h3>
+  <p>
+    해당 화물에 대한 구매 담당자의 주관적 판단을 기록하는 영역입니다.
+    저장하면 시스템에 반영되고, 화물 목록의 광산명 아래에 표시됩니다.
+  </p>
+
+  <table class="field-table">
+    <thead><tr><th>항목</th><th>옵션 / 설명</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Direction (시장 방향)</strong></td>
+        <td>
+          <span class="pill bull">Bull</span> 강세 &nbsp;|&nbsp;
+          <span class="pill neutral">Neutral</span> 중립 &nbsp;|&nbsp;
+          <span class="pill bear">Bear</span> 약세
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Action (운영 제안)</strong></td>
+        <td>
+          Buy now (즉시 매입) / Wait (관망) / Lock index (지수 고정) /
+          Watch (모니터링) / Avoid (회피)
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Target $/t</strong></td>
+        <td>목표 결제가 (달러/톤), 예: $82.00</td>
+      </tr>
+      <tr>
+        <td><strong>Note</strong></td>
+        <td>비고: 시장 의견, 공급 조건, 판단 근거 등 자유 텍스트</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul class="steps">
+    <li><div class="step-n">1</div><div class="step-body">Direction과 Action을 선택합니다 (해당 버튼 클릭 → 선택 시 하이라이트).</div></li>
+    <li><div class="step-n">2</div><div class="step-body">Target $/t와 Note를 입력합니다 (선택 사항).</div></li>
+    <li><div class="step-n">3</div><div class="step-body"><strong>Save Judgment</strong>를 클릭하여 저장하면 우측 상단에 저장 시간이 표시됩니다.</div></li>
+  </ul>
+
+  <div class="callout tip">
+    <strong>💡 저장 후 효과:</strong>
+    화물 목록에서 해당 화물의 광산명 아래에 간략한 태그가 표시됩니다.
+    예: <code style="background:#eee;padding:1px 6px;border-radius:4px;font-size:12px">Bull · Wait · $82.00/t</code>
+    목록 화면에서 모든 화물의 판단 상태를 한눈에 파악할 수 있습니다.
+  </div>
+</div>
+
+
+<!-- ══════════════ SECTION 5 ══════════════ -->
+<div class="section" id="s5">
+  <div class="section-title">
+    <div class="section-num">5</div>
+    <h2>가격 예측 (Price Forecast)</h2>
+  </div>
+
+  <p>
+    상단 <strong>Price Forecast</strong> 탭을 클릭하여 진입합니다.
+    향후 수 주간의 ICI 지수 예측값을 관리하고, 모든 지수 연동 화물의 예상 결제가를 자동으로 계산합니다.
+  </p>
+
+  <h3>5.1 &nbsp; 상단 컨트롤 바</h3>
+  <table class="field-table">
+    <thead><tr><th>컨트롤</th><th>설명</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Base 태그</strong></td><td>최신 발표된 ICI3 가격 표시 (기준 참조)</td></tr>
+      <tr><td><strong>Trend 선택기</strong><br>Flat / +1%/wk / -1%/wk 등</td><td>선택 시 데이터가 없는 예측 행에 해당 추세로 자동 값 입력</td></tr>
+      <tr><td><strong>Show history / Hide history</strong></td><td>당해 연도 과거 월 ICI 데이터 표시/숨기기 (기본: 현재 월 이후만 표시)</td></tr>
+      <tr><td><strong>+ Week</strong></td><td>예측 매트릭스 하단에 행 추가 (더 먼 미래 주 수동 추가용)</td></tr>
+      <tr><td><strong>Save Forecast</strong></td><td>현재 예측 데이터를 시스템에 저장하여 팀 전체와 공유</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 &nbsp; 주별 ICI 예측 매트릭스</h3>
+  <p>표에 주 단위로 각 ICI 데이터가 나열되며, 두 가지 행 유형이 있습니다.</p>
+  <ul style="padding-left:20px;font-size:14px;line-height:2.2">
+    <li><strong>회색 행 (Actual)</strong>: Argus가 공식 발표한 주별 ICI 데이터. 읽기 전용</li>
+    <li><strong>흰색 행 (Forecast)</strong>: 아직 발표되지 않은 예측 행. ICI2–ICI5 수동 입력 가능, Note 컬럼에 메모 작성 가능</li>
+  </ul>
+  <div class="callout warn">
+    <strong>주의:</strong> 예측 행 수정 후 반드시 <strong>Save Forecast</strong>를 클릭해야 저장됩니다.
+    저장하지 않으면 새로고침 시 데이터가 초기화됩니다.
+  </div>
+
+  <h3>5.3 &nbsp; 월평균 가격 요약</h3>
+  <p>
+    예측 매트릭스 아래에 월별 평균가 요약 표가 있으며, ICI2–ICI5의 월 평균값(발표 완료+예측 데이터 합산)을 표시합니다.
+    해당 월 데이터가 "Actual"(전체 발표 완료), "Forecast"(전체 예측), "Partial"(혼합) 중 어느 상태인지 함께 표시됩니다.
+  </p>
+
+  <h3>5.4 &nbsp; 화물 결제 매트릭스 (Cargo Settlement Matrix)</h3>
+  <p>
+    화면 하단에 <strong>미판매 지수 연동 화물</strong>과 예상 결제가가 모두 표시되며, 가격 민감도 조정을 지원합니다.
+  </p>
+  <table class="field-table">
+    <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Cargo / Mine</strong></td><td>화물 광산 및 규격</td></tr>
+      <tr><td><strong>CV</strong></td><td>발열량 (예: 4400 NAR)</td></tr>
+      <tr><td><strong>Laycan</strong></td><td>선적 기간</td></tr>
+      <tr><td><strong>Pricing Period</strong></td><td>시스템이 계산한 결제 참조 기간</td></tr>
+      <tr><td><strong>Formula</strong></td><td>계약 가격 공식</td></tr>
+      <tr><td><strong>Latest Est. $/t</strong></td><td>최신 발표 ICI 기준 현재 추정 결제가</td></tr>
+      <tr><td><strong>Forecast $/t</strong></td><td>예측 ICI(미발표 주 포함) 기준 예상 결제가</td></tr>
+      <tr><td><strong>Change</strong></td><td>예측가와 최신 추정가의 차이</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    우측 상단의 <strong>Sensitivity (+$2/+$1/Base/-$1/-$2)</strong> 선택기로
+    모든 화물에 동시에 가격 오프셋을 적용하여 전체 민감도를 확인할 수 있습니다.
+  </p>
+</div>
+
+
+<!-- ══════════════ SECTION 6 ══════════════ -->
+<div class="section" id="s6">
+  <div class="section-title">
+    <div class="section-num">6</div>
+    <h2>포트폴리오 분석 (Portfolio Analytics)</h2>
+  </div>
+
+  <p>
+    상단 <strong>Portfolio Analytics</strong>를 클릭하여 진입합니다. 연간 구매 포트폴리오의 구조 분석을 표시합니다.
+    상단에 연도 전환 버튼이 있어 과거 연도 데이터도 조회할 수 있습니다.
+  </p>
+
+  <table class="field-table">
+    <thead><tr><th>모듈</th><th>내용 설명</th></tr></thead>
+    <tbody>
+      <tr><td><strong>KPI 요약 카드</strong></td><td>연간 총량, 고정가/지수 연동 비중, 판매 완료/판매 중/계획 수량</td></tr>
+      <tr><td><strong>Procurement Target Progress</strong></td><td>인도네시아탄, 러시아탄, 합계의 목표 달성 진행률</td></tr>
+      <tr><td><strong>Monthly Volume Trend</strong></td><td>월별 Sold / For Sale / Planned 수량 막대 차트</td></tr>
+      <tr><td><strong>Mine Volume Ranking</strong></td><td>광산별 수량, 화물 수, 비중 집계. 차트 막대 클릭 시 필터 적용</td></tr>
+      <tr><td><strong>Buyer Exposure</strong></td><td>바이어별 수량, 화물 수, 비중. 바이어 필터 적용 가능</td></tr>
+      <tr><td><strong>Re-export Trade</strong></td><td>중계 무역 화물(GDG, XFR, BARY 등 바이어)의 전용 요약</td></tr>
+      <tr><td><strong>Heat Value Mix</strong></td><td>발열량(GAR/NAR)별 수량 분포</td></tr>
+      <tr><td><strong>Fixed Price Trend</strong></td><td>발열량 구간별 고정 가격 추세 꺾은선 차트</td></tr>
+      <tr><td><strong>Heat Value vs Buyer Matrix</strong></td><td>바이어별로 어떤 발열량 종류를 구매했는지 교차 표</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout tip">
+    <strong>💡 인터랙션 팁:</strong>
+    Mine Volume Ranking과 Buyer Exposure의 차트 막대는 클릭 가능합니다. 특정 광산/바이어를 클릭하면
+    화면 우측 상단에 필터 태그가 나타나며, 전체 분석 화면이 해당 광산/바이어 데이터로 자동 집중됩니다.
+    다시 클릭하면 필터가 해제됩니다.
+  </div>
+</div>
+
+
+<!-- ══════════════ SECTION 7 ══════════════ -->
+<div class="section" id="s7">
+  <div class="section-title">
+    <div class="section-num">7</div>
+    <h2>데이터 관리 작업</h2>
+  </div>
+
+  <!-- 7.1 -->
+  <h3>7.1 &nbsp; 신규 화물 추가</h3>
+  <ul class="steps">
+    <li><div class="step-n">1</div><div class="step-body">월별 계획 화면에서 우측 상단 <strong>Add Cargo</strong> 버튼을 클릭합니다.</div></li>
+    <li><div class="step-n">2</div><div class="step-body">팝업 양식의 각 항목을 입력합니다 (아래 표 참조).</div></li>
+    <li><div class="step-n">3</div><div class="step-body"><strong>Save</strong>를 클릭하면 화물이 목록에 자동으로 추가됩니다.</div></li>
+  </ul>
+
+  <table class="field-table">
+    <thead><tr><th>항목</th><th>필수</th><th>설명</th></tr></thead>
+    <tbody>
+      <tr><td>Year / Month</td><td>✓</td><td>화물 귀속 연월</td></tr>
+      <tr><td>Status</td><td>✓</td><td>Sold / For Sale / Planned</td></tr>
+      <tr><td>Type</td><td>✓</td><td>Fixed (고정가) / Index (지수 연동)</td></tr>
+      <tr><td>Mine</td><td>✓</td><td>광산명 (예: Adaro)</td></tr>
+      <tr><td>Spec</td><td>✓</td><td>석탄 규격 (예: NAR4400)</td></tr>
+      <tr><td>Quantity MT</td><td>✓</td><td>수량 (톤)</td></tr>
+      <tr><td>Fixed Price</td><td>(고정가 필수)</td><td>고정 가격 $/t</td></tr>
+      <tr><td>Index Formula</td><td>(지수 연동 필수)</td><td>가격 공식 (예: ICI3/4600*4400+2.75)</td></tr>
+      <tr><td>Index Rule</td><td>(지수 연동 필수)</td><td>가격 산정 규칙 (예: 1 month before laycan)</td></tr>
+      <tr><td>Buyer</td><td>—</td><td>바이어명 (미판매 시 공란 가능)</td></tr>
+      <tr><td>Laycan Start / End</td><td>✓</td><td>선적 기간 시작/종료일</td></tr>
+      <tr><td>Purchase Date</td><td>✓</td><td>구매 일자</td></tr>
+      <tr><td>Loading Window / Notes</td><td>—</td><td>선적 비고 (예: 7.6–7.15)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout tip">
+    <strong>💡 수정 및 삭제:</strong>
+    화물 목록에서 해당 행을 클릭하여 가격 산정 워크벤치에 진입한 후, 좌측 상단의 <strong>Edit Cargo</strong> 버튼을 클릭하면 화물을 수정할 수 있습니다.
+    수정 양식 내 <strong>Delete</strong> 버튼으로 삭제도 가능합니다 (복구 불가, 신중하게 사용).
+  </div>
+
+  <!-- 7.2 -->
+  <h3>7.2 &nbsp; ICI 데이터 업데이트</h3>
+  <p>매주 Argus의 신규 데이터 발표 후 시스템에 수동으로 입력해야 합니다.</p>
+  <ul class="steps">
+    <li><div class="step-n">1</div><div class="step-body">월별 계획 화면에서 우측 하단 <strong>Update ICI</strong> 버튼을 클릭합니다.</div></li>
+    <li><div class="step-n">2</div><div class="step-body">팝업 양식에 <strong>Publication Date</strong> (발표일)와 ICI1–ICI5 최신 가격을 입력합니다.</div></li>
+    <li><div class="step-n">3</div><div class="step-body"><strong>Save ICI</strong>를 클릭하면 모든 지수 연동 화물의 결제 추정값이 자동으로 업데이트됩니다.</div></li>
+  </ul>
+  <div class="callout warn">
+    <strong>주의:</strong> ICI1은 실제 값을 입력하지만 현재 계산 공식은 주로 ICI2–ICI5에 의존합니다.
+    대부분의 화물이 ICI3에 연동되어 있으므로 ICI3 데이터의 정확성을 반드시 확인하십시오.
+  </div>
+
+  <!-- 7.3 -->
+  <h3>7.3 &nbsp; 화물 상태 빠른 변경</h3>
+  <p>
+    월별 계획 화면 우측의 화물 상세 패널(Cargo Detail)에서 수정 양식을 열지 않고 상태를 빠르게 전환할 수 있습니다.
+  </p>
+  <ul style="padding-left:20px;font-size:14px;line-height:2.2">
+    <li><strong>Mark as Sold</strong> — 화물을 판매 완료로 표시 (바이어 항목은 수정 양식에서 별도 입력 필요)</li>
+    <li><strong>Mark as For Sale</strong> — 판매 중 상태로 변경</li>
+    <li><strong>Mark as Planned</strong> — 계획 중 상태로 변경</li>
+  </ul>
+
+  <!-- 7.4 -->
+  <h3>7.4 &nbsp; Excel 데이터 가져오기</h3>
+  <p>Excel 파일에서 화물 데이터를 일괄 가져올 수 있습니다 (월별 데이터 업데이트에 활용).</p>
+  <ul class="steps">
+    <li><div class="step-n">1</div><div class="step-body">상단 <strong>Import Data ↑</strong> 버튼을 클릭합니다.</div></li>
+    <li><div class="step-n">2</div><div class="step-body">파일 선택 창에서 <strong>.xlsx</strong> 파일을 선택합니다.</div></li>
+    <li><div class="step-n">3</div><div class="step-body">시스템이 자동으로 처리하며, 가져오기 완료 후 요약 메시지가 표시됩니다.</div></li>
+  </ul>
+  <div class="callout warn">
+    <strong>주의:</strong> 가져오기 전 시스템이 현재 데이터를 자동으로 백업합니다. 가져오기 오류 발생 시 시스템 관리자에게 백업 복원을 요청하십시오.
+    업로드 파일 형식은 반드시 .xlsx여야 합니다 (.xls 또는 .csv 미지원).
+  </div>
+</div>
+
+
+<!-- ══════════════ SECTION 8 ══════════════ -->
+<div class="section" id="s8">
+  <div class="section-title">
+    <div class="section-num">8</div>
+    <h2>용어집</h2>
+  </div>
+  <dl class="glossary">
+    <dt>ICI (Indonesia Coal Index)</dt>
+    <dd>Argus가 매주 발표하는 인도네시아 석탄 기준 가격 지수. ICI2 (NAR5000), ICI3 (NAR4200), ICI4 (NAR3800), ICI5 (NAR3400)로 구분됩니다.</dd>
+
+    <dt>NAR / GAR</dt>
+    <dd>NAR = Net As Received (도착 기준 순 발열량); GAR = Gross As Received (총 발열량). 동일 석탄의 경우 GAR > NAR이며, 환산 계수는 약 0.96입니다.</dd>
+
+    <dt>Laycan</dt>
+    <dd>선박 선적 기간 (Loading + Cancellation). 계약에서 규정한 선박의 입항 및 선적 가능 기간입니다.</dd>
+
+    <dt>Index Rule (가격 산정 규칙)</dt>
+    <dd>계약에서 어느 기간의 ICI 평균 가격을 결제에 적용할지 정한 규칙. 대표 유형: 1 month before laycan (Laycan 전월 평균), 4 weeks before laycan (Laycan 전 4주 평균), 3 weeks before laycan.</dd>
+
+    <dt>Pricing Period (가격 산정 참조 기간)</dt>
+    <dd>Index Rule과 Laycan 날짜를 기반으로 시스템이 자동 계산한 실제 참조 기간. 예: "May 2026 avg".</dd>
+
+    <dt>Settlement (결제가)</dt>
+    <dd>계약 공식(예: ICI3/4600*4400+2.75)에 가격 산정 참조 기간의 ICI 평균을 대입하여 계산된 최종 구매 결제가 ($/t).</dd>
+
+    <dt>Sensitivity (민감도)</dt>
+    <dd>ICI 지수가 가정상 상하 변동(예: ±$1/t)할 때 최종 결제가에 미치는 영향 분석. 가격 리스크 평가에 활용됩니다.</dd>
+
+    <dt>Judgment (가격 판단)</dt>
+    <dd>구매 담당자가 특정 화물에 대해 시장 방향(Bull/Neutral/Bear)과 운영 행동(Buy now/Wait 등)을 기록하는 주관적 판단. 저장 후 팀 전체가 공유 조회 가능합니다.</dd>
+
+    <dt>Fixed Price</dt>
+    <dd>고정 가격 계약. 계약 시점에 가격이 확정되며 지수 변동의 영향을 받지 않습니다.</dd>
+
+    <dt>Index Price / Floating Price</dt>
+    <dd>지수 연동 가격 계약. 최종 결제가가 특정 기간의 ICI 평균에 따라 공식으로 계산되므로 가격 변동 리스크가 존재합니다.</dd>
+
+    <dt>For Sale Plan</dt>
+    <dd>판매 중인 구매 계획. 즉, 바이어를 아직 찾지 못한 화물 목록으로, 영업팀의 외부 오퍼 기준이 됩니다.</dd>
+  </dl>
+</div>
+
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<div style="border-top:1px solid var(--line);padding-top:24px;text-align:center;color:var(--faint);font-size:12px;margin-top:40px">
+  KCH Purchase Plan — 내부 시스템 문서 &nbsp;·&nbsp; 문의사항은 시스템 관리자에게 연락하세요 &nbsp;·&nbsp; lechen@kchenergy.com
+</div>
+
+</div><!-- /shell -->
+</body>
+</html>

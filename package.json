@@ -1,0 +1,11 @@
+{
+  "name": "kch-purchase-plan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KCH purchase and sale-plan dashboard",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "check": "node --check app.js && node --check server.mjs"
+  }
+}

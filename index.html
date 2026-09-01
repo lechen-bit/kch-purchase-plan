@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KCH Purchase Plan</title>
+    <link rel="icon" type="image/png" href="./kch-logo.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <img class="brand-logo" id="brandLogo" src="./kch-logo.png" alt="KCH" title="Back to dashboard" />
+          <div>
+            <h1>KCH Purchase Plan</h1>
+            <p id="dataStatus">Procurement System</p>
+          </div>
+          <time id="todayLabel" class="today-label"></time>
+        </div>
+        <div class="top-controls">
+          <div class="view-tabs" role="tablist" aria-label="Page view">
+            <button class="tab is-active" data-view="dashboard" type="button">Monthly Plan</button>
+            <button class="tab" data-view="analytics" type="button">Portfolio Analytics</button>
+            <button class="tab" data-view="forecast" type="button">Price Forecast</button>
+          </div>
+          <label class="search-field">
+            <span aria-hidden="true">⌕</span>
+            <input id="searchInput" type="search" placeholder="Search cargo / mine / buyer" />
+          </label>
+          <button class="tool-button" id="exportButton" type="button" title="Export sale plan with sold and for-sale cargoes">
+            <span aria-hidden="true">↓</span>
+            <span>Export Sale Plan</span>
+          </button>
+          <input class="visually-hidden" id="excelImportInput" type="file" accept=".xlsx,.xlsm" />
+          <button class="tool-button dark" id="importExcelButton" type="button" title="Import procurement Excel">
+            <span aria-hidden="true">↑</span>
+            <span>Import Data</span>
+          </button>
+          <span class="import-status" id="importStatus"></span>
+        </div>
+      </header>
+
+      <main class="main-grid view-page" id="dashboardPage">
+        <section class="panel summary-panel" aria-labelledby="dashboardTitle">
+          <div class="section-head">
+            <div>
+              <h2 id="dashboardTitle">Monthly Plan</h2>
+              <p id="periodLabel">2026 May</p>
+            </div>
+            <div class="header-actions">
+              <button class="tool-button dark" id="addCargoButton" type="button">Add Cargo</button>
+              <div class="year-control">
+                <button class="icon-button" id="prevYear" type="button" title="Previous year">‹</button>
+                <strong id="yearLabel">2026</strong>
+                <button class="icon-button" id="nextYear" type="button" title="Next year">›</button>
+              </div>
+            </div>
+          </div>
+          <div class="month-tabs" id="monthTabs"></div>
+          <div class="kpi-grid" id="kpiGrid"></div>
+        </section>
+
+        <section class="panel cargo-panel" aria-labelledby="cargoTitle">
+          <div class="section-head">
+            <div>
+              <h2 id="cargoTitle">Cargo List</h2>
+              <p id="tableSubtitle">Filter by status, pricing type, mine, and buyer</p>
+            </div>
+            <div class="table-count" id="tableCount">0 cargos</div>
+          </div>
+
+          <div class="filter-grid">
+            <div>
+              <p>Status</p>
+              <div class="status-tabs" role="tablist" aria-label="Status">
+                <button class="tab is-active" data-status="all" type="button">All</button>
+                <button class="tab" data-status="sold" type="button">Sold</button>
+                <button class="tab" data-status="forsale" type="button">For Sale</button>
+                <button class="tab" data-status="planned" type="button">Planned</button>
+              </div>
+            </div>
+            <div>
+              <p>Type</p>
+              <div class="status-tabs" role="tablist" aria-label="Purchase Type">
+                <button class="tab is-active" data-type="all" type="button">All</button>
+                <button class="tab" data-type="fixed" type="button">Fixed</button>
+                <button class="tab" data-type="index" type="button">Index</button>
+              </div>
+            </div>
+            <label>
+              <p>Mine</p>
+              <select id="mineFilter" aria-label="Mine filter"></select>
+            </label>
+            <label>
+              <p>Buyer</p>
+              <select id="buyerFilter" aria-label="Buyer filter"></select>
+            </label>
+          </div>
+
+          <div class="handoff-guide" role="note">
+            <div>
+              <strong>Marketing Handoff</strong>
+              <span>구매 확정 후 물량 · 가격식 · 최신 인덱스 · 특이조건 · 확정 Laycan을 한 줄로 공유하세요.</span>
+            </div>
+            <span class="handoff-guide-note">행을 펼치면 공유 문구를 바로 복사할 수 있습니다.</span>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Status</th>
+                  <th>Mine</th>
+                  <th>Spec</th>
+                  <th class="numeric">Qty</th>
+                  <th>Price Basis</th>
+                  <th>Type</th>
+                  <th>Index Ref.</th>
+                  <th>Buyer</th>
+                  <th>Terms</th>
+                  <th>Laycan</th>
+                </tr>
+              </thead>
+              <tbody id="cargoRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside class="panel detail-panel" aria-labelledby="detailTitle" hidden aria-hidden="true">
+          <div class="section-head compact">
+            <div>
+              <h2 id="detailTitle">Cargo Detail</h2>
+              <p id="detailSubhead">Select a cargo to review settlement logic</p>
+            </div>
+          </div>
+          <div id="cargoDetail"></div>
+        </aside>
+
+        <section class="panel market-panel" aria-labelledby="marketTitle">
+          <div class="section-head">
+            <div>
+              <h2 id="marketTitle">Argus ICI Index</h2>
+              <p id="marketSubtitle">Weekly index and settlement reference period</p>
+            </div>
+            <button class="tool-button dark" id="updateIciButton" type="button">Update ICI</button>
+            <div class="chart-tabs" role="tablist" aria-label="ICI chart index">
+              <button class="tab" data-chart-index="ici2" type="button">ICI2</button>
+              <button class="tab is-active" data-chart-index="ici3" type="button">ICI3</button>
+              <button class="tab" data-chart-index="ici4" type="button">ICI4</button>
+              <button class="tab" data-chart-index="ici5" type="button">ICI5</button>
+            </div>
+          </div>
+          <div class="market-cards" id="marketCards"></div>
+          <div class="chart-wrap">
+            <canvas id="iciChart" aria-label="ICI historical index chart"></canvas>
+          </div>
+        </section>
+
+      </main>
+
+      <main class="forecast-page view-page" id="forecastPage" hidden>
+        <section class="panel forecast-panel">
+
+          <!-- ── Top bar ── -->
+          <div class="fc-topbar">
+            <div class="fc-topbar-left">
+              <h2>Price Forecast</h2>
+              <span class="fc-base-badge" id="fcBaseLabel"></span>
+            </div>
+            <div class="fc-topbar-right">
+              <span class="trend-label">Trend:</span>
+              <div class="trend-selector" id="trendSelector" role="group" aria-label="Trend model"></div>
+              <button class="tool-button dark" id="saveForecastButton" type="button">Save Forecast</button>
+              <span class="save-status" id="forecastStatus"></span>
+            </div>
+          </div>
+
+          <!-- ── Weekly Forecast Matrix ── -->
+          <div class="fc-section-head">
+            <span id="fcPeriodLabel">May – Aug 2026 · Weekly ICI Forecast</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="tool-button" id="fcHistoryToggle" type="button">Show history</button>
+              <button class="tool-button" id="addForecastWeekButton" type="button">+ Week</button>
+            </div>
+          </div>
+          <div class="table-wrap fc-matrix-wrap">
+            <table class="fc-table">
+              <thead>
+                <tr>
+                  <th class="fc-th fc-col-month">Month</th>
+                  <th class="fc-th fc-col-wk">Wk</th>
+                  <th class="fc-th fc-col-date">Published Date</th>
+                  <th class="fc-th numeric">ICI2 $/t</th>
+                  <th class="fc-th numeric">ICI3 $/t</th>
+                  <th class="fc-th numeric">ICI4 $/t</th>
+                  <th class="fc-th numeric">ICI5 $/t</th>
+                  <th class="fc-th">Note</th>
+                </tr>
+              </thead>
+              <tbody id="fcMatrixBody"></tbody>
+            </table>
+          </div>
+
+          <!-- ── Monthly Averages ── -->
+          <div class="fc-section-head" style="margin-top:18px">
+            <span>Monthly Averages — used for cargo settlement pricing</span>
+          </div>
+          <div class="table-wrap fc-avg-wrap">
+            <table class="fc-table">
+              <thead>
+                <tr>
+                  <th class="fc-th" style="min-width:110px">Month</th>
+                  <th class="fc-th numeric">ICI2 Avg</th>
+                  <th class="fc-th numeric">ICI3 Avg</th>
+                  <th class="fc-th numeric">ICI4 Avg</th>
+                  <th class="fc-th numeric">ICI5 Avg</th>
+                  <th class="fc-th numeric">Weeks</th>
+                </tr>
+              </thead>
+              <tbody id="fcAvgBody"></tbody>
+            </table>
+          </div>
+
+          <!-- ── Settlement Matrix ── -->
+          <div class="fc-section-head" style="margin-top:18px">
+            <span>Cargo Settlement Matrix — unsold index-linked cargo</span>
+            <div class="shift-selector-wrap">
+              <span class="trend-label">Sensitivity:</span>
+              <div class="shift-selector" id="fcShiftSelector" role="group" aria-label="Price sensitivity"></div>
+            </div>
+          </div>
+          <div class="table-wrap fc-settlement-wrap">
+            <table class="fc-table">
+              <thead>
+                <tr>
+                  <th class="fc-th">Cargo</th>
+                  <th class="fc-th">Mine</th>
+                  <th class="fc-th numeric">CV</th>
+                  <th class="fc-th">Laycan</th>
+                  <th class="fc-th">Pricing Period</th>
+                  <th class="fc-th">Formula</th>
+                  <th class="fc-th numeric">Qty MT</th>
+                  <th class="fc-th">Index Avg Used</th>
+                  <th class="fc-th numeric">Latest Est. $/t</th>
+                  <th class="fc-th numeric" id="fcForecastColHeader">Forecast $/t</th>
+                  <th class="fc-th numeric">Change</th>
+                </tr>
+              </thead>
+              <tbody id="fcSettlementBody"></tbody>
+            </table>
+          </div>
+
+        </section>
+      </main>
+
+      <main class="cdp-page view-page" id="cargoDetailPage" hidden>
+        <div class="cdp-header">
+          <button class="tool-button" id="cdpBackButton" type="button">← Back to Plan</button>
+          <div class="cdp-header-title">
+            <h2 id="cdpTitle">Cargo Pricing Workbench</h2>
+            <span id="cdpSubtitle">Single cargo procurement price analysis</span>
+          </div>
+        </div>
+
+        <div class="cdp-layout">
+          <!-- Left: Cargo Info -->
+          <section class="panel cdp-info-panel">
+            <div class="section-head compact">
+              <div><h3>Cargo Details</h3></div>
+            </div>
+            <div id="cdpCargoInfo"></div>
+          </section>
+
+          <!-- Right: Pricing Analysis -->
+          <div class="cdp-right">
+            <!-- ICI Reference Rows -->
+            <section class="panel cdp-ref-panel">
+              <div class="section-head compact">
+                <div>
+                  <h3 id="cdpRefTitle">ICI Reference</h3>
+                  <p id="cdpRefPeriodLabel">Pricing reference period</p>
+                </div>
+              </div>
+              <div id="cdpRefTableContainer"></div>
+            </section>
+
+            <!-- Settlement Sensitivity -->
+            <section class="panel cdp-sensitivity-panel">
+              <div class="section-head compact">
+                <div>
+                  <h3>Settlement Sensitivity</h3>
+                  <p>Settlement $/t under ICI shift scenarios — no quantity multiplication</p>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="fc-table">
+                  <thead>
+                    <tr>
+                      <th class="fc-th">Scenario</th>
+                      <th class="fc-th numeric">Forecast $/t</th>
+                      <th class="fc-th numeric">Change vs Base $/t</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cdpSensitivityBody"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- Procurement Price Judgment -->
+            <section class="panel cdp-judgment-panel">
+              <div class="section-head compact">
+                <div>
+                  <h3>Procurement Price Judgment</h3>
+                  <p>Market view and buying action for this cargo</p>
+                </div>
+                <span class="save-status" id="cdpJudgmentSavedAt"></span>
+              </div>
+              <div class="cdp-judgment-form">
+                <div class="cdp-judgment-row">
+                  <span class="cdp-judgment-label">Direction</span>
+                  <div class="cdp-choice-group" id="cdpDirectionGroup" role="group" aria-label="Market direction">
+                    <button class="cdp-choice" data-cdp-direction="bull" type="button">Bull</button>
+                    <button class="cdp-choice" data-cdp-direction="neutral" type="button">Neutral</button>
+                    <button class="cdp-choice" data-cdp-direction="bear" type="button">Bear</button>
+                  </div>
+                </div>
+                <div class="cdp-judgment-row">
+                  <span class="cdp-judgment-label">Action</span>
+                  <div class="cdp-choice-group" id="cdpActionGroup" role="group" aria-label="Buying action">
+                    <button class="cdp-choice" data-cdp-action="buy_now" type="button">Buy now</button>
+                    <button class="cdp-choice" data-cdp-action="wait" type="button">Wait</button>
+                    <button class="cdp-choice" data-cdp-action="lock_index" type="button">Lock index</button>
+                    <button class="cdp-choice" data-cdp-action="watch" type="button">Watch</button>
+                    <button class="cdp-choice" data-cdp-action="avoid" type="button">Avoid</button>
+                  </div>
+                </div>
+                <div class="cdp-judgment-row">
+                  <label class="cdp-judgment-label" for="cdpTargetSettlement">Target $/t</label>
+                  <input class="cdp-target-input" id="cdpTargetSettlement" type="number" step="0.01" placeholder="e.g. 106.50" />
+                </div>
+                <div class="cdp-judgment-row cdp-note-row">
+                  <label class="cdp-judgment-label" for="cdpNote">Note</label>
+                  <textarea class="cdp-note-input" id="cdpNote" rows="2" placeholder="Rationale, market view, supplier terms…"></textarea>
+                </div>
+                <div class="cdp-judgment-actions">
+                  <button class="tool-button dark" id="cdpSaveJudgment" type="button">Save Judgment</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+
+      <main class="analytics-page view-page" id="analyticsPage" hidden>
+        <section class="panel analytics-hero" aria-labelledby="portfolioTitle">
+          <div class="section-head">
+            <div>
+              <h2 id="portfolioTitle">Portfolio Analytics</h2>
+              <p id="summarySubtitle">Annual procurement structure, buyer exposure, and heat value mix</p>
+            </div>
+            <div class="year-control">
+              <button class="icon-button" id="analyticsPrevYear" type="button" title="Previous year">‹</button>
+              <strong id="analyticsYearLabel">2026</strong>
+              <button class="icon-button" id="analyticsNextYear" type="button" title="Next year">›</button>
+            </div>
+          </div>
+          <div class="kpi-grid analytics-kpis" id="analyticsKpiGrid"></div>
+          <div class="filter-chips" id="analyticsFilterChips"></div>
+        </section>
+
+        <section class="panel analytics-card full-card target-progress-card" aria-labelledby="targetProgressTitle">
+          <div class="section-head compact">
+            <div>
+              <h2 id="targetProgressTitle">2026 Procurement Target Progress</h2>
+              <p>Indonesia target 13,000,000 MT · Russian coal target 7,000,000 MT · Total target 20,000,000 MT</p>
+            </div>
+          </div>
+          <div class="target-progress-grid" id="targetProgress"></div>
+        </section>
+
+        <section class="panel analytics-card full-card">
+          <div class="section-head compact">
+            <div>
+              <h2>Monthly Volume Trend</h2>
+              <p>Monthly sold, for-sale, and planned cargo volume</p>
+            </div>
+          </div>
+          <div class="analytics-chart tall-chart"><canvas id="monthlyTrendChart"></canvas></div>
+        </section>
+
+        <section class="panel analytics-card wide-card">
+          <div class="section-head compact">
+            <div>
+              <h2>Mine Volume Ranking</h2>
+              <p>Supplier volume by mine</p>
+            </div>
+          </div>
+          <div class="analytics-chart tall-chart"><canvas id="mineVolumeChart"></canvas></div>
+          <div class="table-wrap compact-table analytics-table collapsible-table" id="mineTableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mine</th>
+                  <th class="numeric">Qty</th>
+                  <th>Cargos</th>
+                  <th>Share</th>
+                </tr>
+              </thead>
+              <tbody id="mineSummaryRows"></tbody>
+            </table>
+          </div>
+          <button class="table-toggle" id="mineTableToggle" type="button"></button>
+        </section>
+
+        <section class="panel analytics-card wide-card">
+          <div class="section-head compact">
+            <div>
+              <h2>Buyer Exposure</h2>
+              <p>Buyer volume, unsold exposure, and sales allocation view</p>
+            </div>
+          </div>
+          <div class="analytics-chart tall-chart"><canvas id="buyerVolumeChart"></canvas></div>
+          <div class="table-wrap compact-table analytics-table collapsible-table" id="buyerTableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Buyer</th>
+                  <th class="numeric">Qty</th>
+                  <th>Cargos</th>
+                  <th>Share</th>
+                </tr>
+              </thead>
+              <tbody id="buyerSummaryRows"></tbody>
+            </table>
+          </div>
+          <button class="table-toggle" id="buyerTableToggle" type="button"></button>
+        </section>
+
+        <section class="panel analytics-card full-card reexport-card" aria-labelledby="reexportTitle">
+          <div class="section-head compact">
+            <div>
+              <h2 id="reexportTitle">3국거래 / Re-export Trade</h2>
+              <p>Buyer group: GDG, XFR, BARY, VISA, ADANI, BULK, ENR</p>
+            </div>
+          </div>
+          <div id="reexportTrade"></div>
+        </section>
+
+        <section class="panel analytics-card full-card">
+          <div class="section-head compact">
+            <div>
+              <h2>Heat Value Mix</h2>
+              <p>Heat value distribution using GAR / NAR trading labels</p>
+            </div>
+          </div>
+          <div class="analytics-chart tall-chart"><canvas id="heatMixChart"></canvas></div>
+          <div class="table-wrap compact-table analytics-table collapsible-table" id="heatTableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Heat</th>
+                  <th class="numeric">Qty</th>
+                  <th>Cargos</th>
+                  <th>Share</th>
+                </tr>
+              </thead>
+              <tbody id="heatSummaryRows"></tbody>
+            </table>
+          </div>
+          <button class="table-toggle" id="heatTableToggle" type="button"></button>
+        </section>
+
+        <section class="panel analytics-card full-card">
+          <div class="section-head compact">
+            <div>
+              <h2>Price Analysis</h2>
+              <p>Fixed price trends, index exposure, and estimated settlement comparison</p>
+            </div>
+          </div>
+          <div class="price-grid">
+            <section class="price-subcard full">
+              <div class="section-head compact">
+                <div>
+                  <h3>Fixed Price Trend</h3>
+                  <p>Weighted average fixed price by heat value tier</p>
+                </div>
+              </div>
+              <div class="analytics-chart tall-chart"><canvas id="fixedPriceTrendChart"></canvas></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="panel analytics-card full-card">
+          <div class="section-head compact">
+            <div>
+              <h2>Heat Value vs Buyer Matrix</h2>
+              <p>Which buyer is taking which GAR / NAR product</p>
+            </div>
+          </div>
+          <div class="table-wrap matrix-table">
+            <table id="heatBuyerMatrix"></table>
+          </div>
+        </section>
+
+        <section class="panel analytics-card full-card governance-card">
+          <div class="section-head compact">
+            <div>
+              <h2>Governance & Audit Model</h2>
+              <p>Recommended control model for department sharing and change accountability</p>
+            </div>
+          </div>
+          <div class="governance-grid">
+            <div>
+              <h3>Roles</h3>
+              <ul>
+                <li><strong>Admin</strong><span>Import, delete, and edit all cargo records</span></li>
+                <li><strong>Trader</strong><span>Edit assigned cargo records</span></li>
+                <li><strong>Viewer</strong><span>Read-only cargo and index view</span></li>
+                <li><strong>Management</strong><span>Dashboard and analytics access</span></li>
+              </ul>
+            </div>
+            <div>
+              <h3>Change Log Fields</h3>
+              <ul>
+                <li><strong>Created by</strong><span>Original cargo owner</span></li>
+                <li><strong>Last edited by</strong><span>User responsible for latest change</span></li>
+                <li><strong>Edited time</strong><span>Timestamp for each update</span></li>
+                <li><strong>Change log</strong><span>Status, price, laycan, buyer, and deletion history</span></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <div id="typeSummaryRows" hidden></div>
+      </main>
+    </div>
+
+    <div class="modal-backdrop" id="cargoModal" hidden>
+      <form class="modal-card" id="cargoForm">
+        <div class="modal-head">
+          <div>
+            <h2 id="modalTitle">Add Cargo</h2>
+            <p>Changes are saved to the shared data file when the service is connected</p>
+          </div>
+          <button class="icon-button" id="closeModalButton" type="button" title="Close">×</button>
+        </div>
+        <input id="cargoIdField" type="hidden" />
+        <div class="form-grid">
+          <label>Year<input id="formYear" type="number" min="2023" max="2030" required /></label>
+          <label>Month<select id="formMonth"></select></label>
+          <label>Status<select id="formStatus">
+            <option value="sold">Sold</option>
+            <option value="forsale">For Sale</option>
+            <option value="planned">Planned</option>
+          </select></label>
+          <label>Type<select id="formType">
+            <option value="fixed">Fixed</option>
+            <option value="index">Index</option>
+          </select></label>
+          <label>Mine<input id="formMine" required /></label>
+          <label>Spec<input id="formSpec" required /></label>
+          <label>Quantity MT<input id="formQuantity" type="number" min="0" step="1000" required /></label>
+          <label>Fixed Price<input id="formFixedPrice" type="number" step="0.01" /></label>
+          <label class="wide">Index Formula<input id="formFormula" placeholder="ICI3 prorate+3" /></label>
+          <label>Index Rule<select id="formIndexRule">
+            <option value="1 month before laycan">1 month before laycan</option>
+            <option value="4 weeks before laycan">4 weeks before laycan</option>
+            <option value="3 weeks before laycan">3 weeks before laycan</option>
+          </select></label>
+          <label>Buyer<input id="formBuyer" placeholder="Leave blank if unsold" /></label>
+          <label>Laycan Start<input id="formLaycanStart" type="date" required /></label>
+          <label>Laycan End<input id="formLaycanEnd" type="date" required /></label>
+          <label>Laycan Status<select id="formLaycanConfirmed">
+            <option value="false">Tentative</option>
+            <option value="true">Confirmed</option>
+          </select></label>
+          <label>Purchase Date<input id="formPurchaseDate" type="date" required /></label>
+          <label class="wide">Special Terms<input id="formSpecialTerms" placeholder="e.g. 50% prepayment, quality tolerance, optional quantity" /></label>
+          <label class="wide">Sales Remark<input id="formSalesRemark" placeholder="For sale plan only: e.g. Prepay 50%, Push to Nov, Qty TBC" /></label>
+          <label class="wide">Additional Notes<input id="formNotes" placeholder="Internal notes (optional)" /></label>
+        </div>
+        <div class="modal-actions">
+          <button class="tool-button danger" id="deleteCargoButton" type="button">Delete</button>
+          <span class="save-status" id="saveStatus"></span>
+          <button class="tool-button" id="cancelModalButton" type="button">Cancel</button>
+          <button class="tool-button dark" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+    <div class="modal-backdrop" id="iciModal" hidden>
+      <form class="modal-card compact-modal" id="iciForm">
+        <div class="modal-head">
+          <div>
+            <h2>Update ICI</h2>
+            <p>Enter the latest weekly Argus ICI prices. Index cargo estimates recalculate after saving.</p>
+          </div>
+          <button class="icon-button" id="closeIciModalButton" type="button" title="Close">×</button>
+        </div>
+        <div class="form-grid ici-form-grid">
+          <label>Publication Date<input id="iciDate" type="date" required /></label>
+          <label>ICI1<input id="ici1Input" type="number" step="0.01" required /></label>
+          <label>ICI2<input id="ici2Input" type="number" step="0.01" required /></label>
+          <label>ICI3<input id="ici3Input" type="number" step="0.01" required /></label>
+          <label>ICI4<input id="ici4Input" type="number" step="0.01" required /></label>
+          <label>ICI5<input id="ici5Input" type="number" step="0.01" required /></label>
+        </div>
+        <div class="modal-actions">
+          <span class="save-status" id="iciSaveStatus"></span>
+          <button class="tool-button" id="cancelIciModalButton" type="button">Cancel</button>
+          <button class="tool-button dark" type="submit">Save ICI</button>
+        </div>
+      </form>
+    </div>
+    <script src="./data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
