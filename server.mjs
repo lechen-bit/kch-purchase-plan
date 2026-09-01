@@ -11,9 +11,8 @@ const dataJsPath = join(root, "data.js");
 const exampleDataPath = join(root, "data-store.example.json");
 const uploadDir = join(root, "uploads");
 const backupDir = join(root, "backups");
-const pythonPath =
-  process.env.PYTHON ||
-  "C:\\Users\\KCH\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe";
+const pythonCommand = process.env.PYTHON || (process.platform === "win32" ? "py" : "python3");
+const pythonPrefixArgs = process.env.PYTHON || process.platform !== "win32" ? [] : ["-3"];
 const host = process.env.HOST || "0.0.0.0";
 const port = Number(process.env.PORT || 4173);
 
@@ -72,7 +71,7 @@ function sendJson(response, status, payload) {
 
 function runExcelImport(filePath) {
   return new Promise((resolvePromise, rejectPromise) => {
-    const child = spawn(pythonPath, ["import_excel.py"], {
+    const child = spawn(pythonCommand, [...pythonPrefixArgs, "import_excel.py"], {
       cwd: root,
       env: { ...process.env, INPUT_XLSX: filePath },
       windowsHide: true,
